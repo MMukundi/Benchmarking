@@ -1,0 +1,51 @@
+marcelmukundi@Marcels-MacBook-Pro Benchmarking % javac Benchmarking.java                
+marcelmukundi@Marcels-MacBook-Pro Benchmarking % java Benchmarking input1.txt input2.txt
+
+-----------input1.txt Bench Summary----------
+Min: 1
+Med: 2056
+Max: 4000
+
+----------------------Time(Naive Attempt)---------------------
+Insert:      29426565ns||Min:          9618ns||Med:         40550ns||Max:         25430ns
+
+----------------------Time(Improved Attempt)---------------------
+Insert:       7976175ns||Min:          9618ns||Med:         15893ns||Max:          9736ns
+50000 items
+100000 items
+150000 items
+200000 items
+250000 items
+300000 items
+350000 items
+400000 items
+450000 items
+500000 items
+550000 items
+600000 items
+650000 items
+50000 items
+100000 items
+150000 items
+200000 items
+250000 items
+300000 items
+350000 items
+400000 items
+450000 items
+500000 items
+550000 items
+600000 items
+650000 items
+
+-----------input2.txt Bench Summary----------
+Min: 39
+Med: 4003661
+Max: 7999978
+
+----------------------Time(Naive Attempt)---------------------
+Insert: 4580265933193ns||Min:          8716ns||Med:      17325043ns||Max:      17041378ns
+
+----------------------Time(Improved Attempt)---------------------
+Insert: 1665358375838ns||Min:          8716ns||Med:       3694648ns||Max:          8432ns
+marcelmukundi@Marcels-MacBook-Pro Benchmarking % 
