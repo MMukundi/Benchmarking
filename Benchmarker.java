@@ -13,6 +13,7 @@ public class Benchmarker {
         int n = 658116;
 
         //I was unsure about whether comparisons or assignments took longer, so I wrote up this little benchmark that tests just that
+        //(here assignments are used for list traversal)
 
         // This method simulates one that traverses the entire current length of the list every iteration, but only performs log_2(n) comparisons
         // It is inspired by merge sort, which runs in log_n time
@@ -33,6 +34,10 @@ public class Benchmarker {
             for (int i = 0; i < j; i++)
                 x=y;
         b.end();
+
+        // Analysis: with the knowledge that a comparison is what bogs you down, it is no surprise which algorithm wins;
+        // algorithm 1's worst case is n assignments, logn comparisons
+        // algorithm 2's worst case is n assignments, n comparisons
         System.out.printf("%d,%d", b.getBenchmark("checkFewQuitLate"), b.getBenchmark("checkEveryQuitEarly"));
     }
 
