@@ -1,5 +1,9 @@
 import java.util.Iterator;
-public class LinkedList<E> implements Iterable<E>{
+
+//References used to implement range for-each loop
+//https://docs.oracle.com/javase/8/docs/api/java/lang/Iterable.html
+//https://docs.oracle.com/javase/8/docs/api/java/util/Iterator.html
+public class LinkedList<E> implements Iterable<E> {
     public class LinkedListNode {
         E data;
         LinkedListNode nextNode;
@@ -8,17 +12,33 @@ public class LinkedList<E> implements Iterable<E>{
             data = e;
         }
     }
-    public class LinkedListIterator implements Iterator<E>{
-        LinkedListIterator(LinkedListNode node){
+
+    public class LinkedListIterator implements Iterator<E> {
+        LinkedListIterator(LinkedListNode node) {
             currentNode = node;
         }
+
         LinkedListNode currentNode;
-        public boolean hasNext(){
-            return currentNode.nextNode!=null;
+
+        public boolean hasNext() {
+            return currentNode.nextNode != null;
         }
-        public E next(){
+
+        public E next() {
             currentNode = currentNode.nextNode;
+            if (currentNode == null)
+                return null;
             return currentNode.data;
+        }
+
+        public void insertAfter(E e) {
+            LinkedListNode next = currentNode.nextNode;
+            currentNode.nextNode = new LinkedListNode(e);
+            currentNode.nextNode.nextNode = next;
+            if (next == null) {
+                last = currentNode.nextNode;
+            }
+            length++;
         }
     }
 
@@ -62,6 +82,10 @@ public class LinkedList<E> implements Iterable<E>{
     public void insert(E element, int index) {
         if (index > length)
             return;
+        else if (index == length) {
+            insert(element);
+            return;
+        }
         LinkedListNode previousNode = head;
         for (int i = 0; i < index; i++) {
             if (previousNode == null)
@@ -71,12 +95,17 @@ public class LinkedList<E> implements Iterable<E>{
         LinkedListNode oldNextNode = previousNode.nextNode;
         previousNode.nextNode = new LinkedListNode(element);
         previousNode.nextNode.nextNode = oldNextNode;
+        if (oldNextNode == null) {
+            last = previousNode.nextNode;
+        }
         length++;
     }
 
     public E get(int index) {
-        if (index >= length)
+        if (index > length)
             return null;
+        else if (index == length)
+            return last.data;
         LinkedListNode currentNode = head.nextNode;
         for (int i = 0; i < index; i++) {
             if (currentNode == null)
@@ -97,12 +126,23 @@ public class LinkedList<E> implements Iterable<E>{
             previousNode = previousNode.nextNode;
         }
         E data = previousNode.nextNode.data;
-        previousNode.nextNode = previousNode.nextNode.nextNode;
 
+        previousNode.nextNode = previousNode.nextNode.nextNode;
+        if (previousNode.nextNode == null) {
+            last = previousNode;
+        }
+        length--;
         return data;
     }
 
-    public LinkedListIterator iterator(){
+    public LinkedListIterator iterator() {
         return new LinkedListIterator(head);
     }
+
+    public void clear() {
+        head = new LinkedListNode(null);
+        last = head;
+        length = 0;
+    }
+
 }
