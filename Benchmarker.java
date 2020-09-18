@@ -5,6 +5,37 @@ import java.util.Random;
 import java.util.Stack;
 
 public class Benchmarker {
+    public static void main(String[] args) {
+        Benchmarker b = new Benchmarker();
+        int x = 0;
+        int y = 0;
+
+        int n = 658116;
+
+        //I was unsure about whether comparisons or assignments took longer, so I wrote up this little benchmark that tests just that
+
+        // This method simulates one that traverses the entire current length of the list every iteration, but only performs log_2(n) comparisons
+        // It is inspired by merge sort, which runs in log_n time
+        b.start("checkFewQuitLate");
+        int step = n / 2;
+        for (int j = 0; j < n; j++, step /= 2)
+            if (j < step)
+                for (int i = 0; i < step; i++)
+                    x=y;
+            else
+                for (int i = 0; i < step; i++)
+                    y=x;
+        b.end();
+
+        // This method simulates only travels as much of the list as needed every iteration, but performs a comparison at every single step
+        b.start("checkEveryQuitEarly");
+        for (int j = 0; j < n; j++, step /= 2)
+            for (int i = 0; i < j; i++)
+                x=y;
+        b.end();
+        System.out.printf("%d,%d", b.getBenchmark("checkFewQuitLate"), b.getBenchmark("checkEveryQuitEarly"));
+    }
+
     // Random Character Generator
     static Random RCG = new Random();
     Map<String, Benchmark> benchmarks = new HashMap<String, Benchmark>();
@@ -75,7 +106,7 @@ public class Benchmarker {
         // End time recorded at the very beginning of the function to ensure execution
         // as near as possible to previous line
         long endTime = System.nanoTime();
-        if(lastStarted.empty()){
+        if (lastStarted.empty()) {
             System.err.printf("No active benchmarks\n");
             return;
         }
@@ -95,20 +126,20 @@ public class Benchmarker {
         toEnd.ended = true;
     }
 
-    //While possibly useful, I found would involve a "last ended" stack
+    // While possibly useful, I found would involve a "last ended" stack
 
     // public long getBenchmark() {
-    //     String lastEndedName = lastEnded.peek();
-    //     if (!benchmarks.containsKey(lastEndedName)) {
-    //         System.err.printf("Benchmark %s has not started\n", lastEndedName);
-    //         return -1;
-    //     }
-    //     Benchmark benchmark = benchmarks.get(lastEndedName);
-    //     if (!benchmark.ended) {
-    //         System.err.printf("Benchmark %s is still running\n", lastEndedName);
-    //         return -1;
-    //     }
-    //     return benchmark.end - benchmark.start;
+    // String lastEndedName = lastEnded.peek();
+    // if (!benchmarks.containsKey(lastEndedName)) {
+    // System.err.printf("Benchmark %s has not started\n", lastEndedName);
+    // return -1;
+    // }
+    // Benchmark benchmark = benchmarks.get(lastEndedName);
+    // if (!benchmark.ended) {
+    // System.err.printf("Benchmark %s is still running\n", lastEndedName);
+    // return -1;
+    // }
+    // return benchmark.end - benchmark.start;
     // }
 }
 
