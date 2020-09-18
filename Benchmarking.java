@@ -7,29 +7,50 @@ import java.util.Scanner;
 
 class Benchmarking {
     public static void main(String[] args) throws Throwable {
-        if(args.length==0)args = getFiles();
+        if (args.length == 0)
+            args = getFiles();
         for (String fileName : args) {
             Benchmarker benchmarker = new Benchmarker();
             try {
                 Scanner fileScanner = new Scanner(new File(fileName));
                 LinkedList<Integer> list = new LinkedList<Integer>();
                 LinkedList<Integer>.LinkedListIterator iter;
+                String benchmarkID;
+                // // Using the built in iterator and the insert method result in slow insert times
+                // // with this soltion, very close to n^2
+                // // As such, this method was actually too slow to leave in the final code
+                // benchmarkID = "insertNaive";
+                // benchmarker.start(benchmarkID);
+                // while (fileScanner.hasNextInt()) {
+                //     int toInsert = fileScanner.nextInt();
+                //     int insertionIndex = 0;
+                //     for (int otherValue : list) {
+                //         if (toInsert < otherValue)
+                //             break;
+                //         insertionIndex++;
+                //     }
+                //     list.insert(toInsert, insertionIndex);
+                //     if (list.length % 50000 == 0) {
+                //         System.out.printf("%d items\n", list.length);
+                //     }
+                // }
+                // benchmarker.end(benchmarkID);
 
-                // Using the built in iterator and the insert method result in slow insert times
-                // with this soltion
-                String benchmarkID = "insertNaive";
+                // Using the iterator, this insert solution can use the node structure directly,
+                // doing it in at most 2/3 the time
+                list.clear();
+                fileScanner = new Scanner(new File(fileName));
+                benchmarkID = "insertImproved";
                 benchmarker.start(benchmarkID);
                 while (fileScanner.hasNextInt()) {
                     int toInsert = fileScanner.nextInt();
-                    int insertionIndex = 0;
-                    for (int otherValue : list) {
-                        if (toInsert < otherValue)
-                            break;
-                        insertionIndex++;
+                    iter = list.iterator();
+                    while (iter.hasNext() && iter.currentNode.nextNode.data < toInsert) {
+                        iter.next();
                     }
-                    list.insert(toInsert, insertionIndex);
-                    if(list.length%50000==0){
-                        System.out.printf("%d items\n",list.length);
+                    iter.insertAfter(toInsert);
+                    if (list.length % 50000 == 0) {
+                        System.out.printf("%d items\n", list.length);
                     }
                 }
                 benchmarker.end(benchmarkID);
@@ -56,24 +77,6 @@ class Benchmarking {
                 int maxN = iter.currentNode.data;
                 benchmarker.end(benchmarkID);
 
-                // Using the iterator, this insert solution can use the node structure directly, doing it in at most 2/3 the time
-                list.clear();
-                fileScanner = new Scanner(new File(fileName));
-                benchmarkID = "insertImproved";
-                benchmarker.start(benchmarkID);
-                while (fileScanner.hasNextInt()) {
-                    int toInsert = fileScanner.nextInt();
-                    iter = list.iterator();
-                    while (iter.hasNext() && iter.currentNode.nextNode.data <toInsert) {
-                       iter.next();
-                    }
-                    iter.insertAfter(toInsert);
-                    if(list.length%50000==0){
-                        System.out.printf("%d items\n",list.length);
-                    }
-                }
-                benchmarker.end(benchmarkID);
-
                 // This better median solution manually iterates to the mediean index, allowing
                 // for quick next access, roughly halving the time
                 // The iterator stops 1 index short of the typical median index to ensure the
@@ -81,9 +84,9 @@ class Benchmarking {
                 benchmarkID = "medImproved";
                 benchmarker.start(benchmarkID);
                 int medI;
-                int medIndex = list.length / 2-1;
+                int medIndex = list.length / 2 - 1;
                 LinkedList<Integer>.LinkedListNode curr = list.head.nextNode;
-                for (int i = 0; i < medIndex && curr.nextNode!=null; curr=curr.nextNode, i++) {
+                for (int i = 0; i < medIndex && curr.nextNode != null; curr = curr.nextNode, i++) {
                 }
                 if (list.length % 2 == 0) {
                     medI = (curr.data + curr.nextNode.data) / 2;
@@ -98,27 +101,23 @@ class Benchmarking {
                 int maxI = list.last.data;
                 benchmarker.end(benchmarkID);
 
-                // Thanks to the implementation of my LinkedList class, this min search is O(1) for both
+                // Thanks to the implementation of my LinkedList class, this min search is O(1)
+                // for both
                 benchmarkID = "min";
                 benchmarker.start(benchmarkID);
                 int min = list.head.nextNode.data;
                 benchmarker.end(benchmarkID);
 
                 System.out.printf(
-                        "\n-----------%s Bench Summary----------\n" + 
-                        "Min: %d\n" + "Med: %d\n" + "Max: %d\n"+ 
-                        "\n----------------------Time(Naive Attempt)---------------------\n" + 
-                        "Insert: %13dns||Min: %13dns||Med: %13dns||Max: %13dns\n" + 
-                        "\n----------------------Time(Improved Attempt)---------------------\n" + 
-                        "Insert: %13dns||Min: %13dns||Med: %13dns||Max: %13dns\n",
-                        fileName, min, medI, maxI, 
-                        benchmarker.getBenchmark("insertNaive"), 
-                        benchmarker.getBenchmark("min"),
-                        benchmarker.getBenchmark("medNaive"),
-                        benchmarker.getBenchmark("maxNaive"), 
-                        benchmarker.getBenchmark("insertImproved"), 
-                        benchmarker.getBenchmark("min"),
-                        benchmarker.getBenchmark("medImproved"),
+                        "\n-----------%s Bench Summary----------\n" + "Min: %d\n" + "Med: %d\n" + "Max: %d\n"
+                                + "\n----------------------Time(Naive Attempt)---------------------\n"
+                                + "Insert: %13dns||Min: %13dns||Med: %13dns||Max: %13dns\n"
+                                + "\n----------------------Time(Improved Attempt)---------------------\n"
+                                + "Insert: %13dns||Min: %13dns||Med: %13dns||Max: %13dns\n",
+                        fileName, min, medI, maxI, benchmarker.getBenchmark("insertNaive"),
+                        benchmarker.getBenchmark("min"), benchmarker.getBenchmark("medNaive"),
+                        benchmarker.getBenchmark("maxNaive"), benchmarker.getBenchmark("insertImproved"),
+                        benchmarker.getBenchmark("min"), benchmarker.getBenchmark("medImproved"),
                         benchmarker.getBenchmark("maxImproved"));
 
             } catch (FileNotFoundException e) {
@@ -126,19 +125,23 @@ class Benchmarking {
             }
         }
     }
-    public static String[] getFiles(){
+
+    public static String[] getFiles() {
         Scanner in = new Scanner(System.in);
         LinkedList<String> paths = new LinkedList<>();
         String currentPath;
-        while(true){
+        while (true) {
             System.out.printf("\033[s");
-            System.out.printf("\033[uPlease enter a file name%s('/' is used as a path delimiter): ",paths.length==0?"":", or type RUN to begin benchmarking");
-            //https://stackoverflow.com/questions/2733255/java-doesnt-work-with-regex-s-says-invalid-escape-sequence
-            //Referenced to clear up minor regex confusion
-            while(!(currentPath = in.nextLine()).matches("(([^\n\t\r/]+/)*[^\n\t\r/]+)|RUN")){
-                System.out.printf("\033[uThat was an invalid path. Please enter a valid file name%s('/' is used as a path delimiter): ",paths.length==0?"":", or type RUN to begin benchmarking");
+            System.out.printf("\033[uPlease enter a file name%s('/' is used as a path delimiter): ",
+                    paths.length == 0 ? "" : ", or type RUN to begin benchmarking");
+            // https://stackoverflow.com/questions/2733255/java-doesnt-work-with-regex-s-says-invalid-escape-sequence
+            // Referenced to clear up minor regex confusion
+            while (!(currentPath = in.nextLine()).matches("(([^\n\t\r/]+/)*[^\n\t\r/]+)|RUN")) {
+                System.out.printf(
+                        "\033[uThat was an invalid path. Please enter a valid file name%s('/' is used as a path delimiter): ",
+                        paths.length == 0 ? "" : ", or type RUN to begin benchmarking");
             }
-            if(currentPath.equals("RUN")){
+            if (currentPath.equals("RUN")) {
                 break;
             }
             paths.insert(currentPath);
@@ -146,7 +149,7 @@ class Benchmarking {
         }
         String[] pathsArr = new String[paths.length];
         LinkedList<String>.LinkedListIterator iter = paths.iterator();
-        for(int i =0; iter.hasNext();i++){
+        for (int i = 0; iter.hasNext(); i++) {
             pathsArr[i] = iter.next();
         }
         in.close();
