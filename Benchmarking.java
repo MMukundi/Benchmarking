@@ -21,7 +21,8 @@ class Benchmarking{
                 }
                 list.insert(toInsert,insertionIndex);
                 System.out.printf("\033[u\033[s%d values inserted",list.length);
-            }            
+            } 
+            System.out.println("")           
 
             }catch(FileNotFoundException fnf){
                 System.out.printf("File %s not found\n",fileName);
